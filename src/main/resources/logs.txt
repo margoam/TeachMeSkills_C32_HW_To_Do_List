@@ -1,0 +1,1 @@
+[INFO] 2025-01-19 18:35 -> User user2 registered successfully
