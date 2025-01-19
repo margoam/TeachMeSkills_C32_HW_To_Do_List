@@ -3,7 +3,6 @@ package com.teachmeskills.hw.lesson_26.servlet;
 import com.teachmeskills.hw.lesson_26.logging.Logger;
 import com.teachmeskills.hw.lesson_26.model.User;
 import com.teachmeskills.hw.lesson_26.storage.UserStorage;
-import com.teachmeskills.hw.lesson_26.util.UserValidator;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

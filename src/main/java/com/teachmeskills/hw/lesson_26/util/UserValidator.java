@@ -1,9 +1,7 @@
 package com.teachmeskills.hw.lesson_26.util;
 
-import com.teachmeskills.hw.lesson_26.logging.Logger;
 import com.teachmeskills.hw.lesson_26.model.User;
 import com.teachmeskills.hw.lesson_26.storage.UserStorage;
-import jakarta.servlet.http.HttpServletResponse;
 
 public class UserValidator {
 
