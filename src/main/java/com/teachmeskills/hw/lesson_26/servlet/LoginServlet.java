@@ -9,7 +9,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -22,7 +21,7 @@ public class LoginServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         User user = UserStorage.userDatabase.get(username);
@@ -37,7 +36,7 @@ public class LoginServlet extends HttpServlet {
             req.getSession().setAttribute("role", user.getRole());
 
             Logger.log("User logged in: " + user.getLogin() + " (Role: " + user.getRole() + ")");
-            resp.getWriter().println("Hi, " + user.getLogin() + "! Your role is " + user.getRole());
+            req.getRequestDispatcher("/page/to-do.html").forward(req, resp);
         } else {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid username or password.");
         }
@@ -45,19 +44,14 @@ public class LoginServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        resp.setContentType("text/html;charset=UTF-8");
-
-        String username = req.getParameter("username");
-        String password = req.getParameter("password");
-
-        if (UserValidator.validateUserName(username, password)) {
-            HttpSession session = req.getSession();
-            session.setAttribute("username", username);
-            req.getRequestDispatcher("/page/to-do.html").forward(req, resp);
-        } else {
+        String username = (String) req.getSession().getAttribute("username");
+        if (username == null) {
             req.getRequestDispatcher("page/login.html").forward(req, resp);
+            resp.getWriter().println("<h2>Login Failed. Please, sign up</h2>");
+        } else {
+            req.getRequestDispatcher("page/to-do.html").forward(req, resp);
         }
     }
 
