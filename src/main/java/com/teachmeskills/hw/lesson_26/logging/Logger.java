@@ -15,7 +15,7 @@ public class Logger {
         String formattedDate = SIMPLE_DATE_FORMAT.format(new Date());
         String logMessage = "[INFO] " + formattedDate + " -> " + message;
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(INFO_LOG_PATH.toFile(), true))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(INFO_LOG_PATH, true))) {
             writer.write(logMessage);
             writer.newLine();
         } catch (IOException e) {

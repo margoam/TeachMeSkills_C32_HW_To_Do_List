@@ -32,7 +32,7 @@ public class RegistrationServlet extends HttpServlet {
         if (password.equals(confirmPassword) && !UserStorage.userDatabase.containsKey(username)) {
             HttpSession session = req.getSession();
             session.setAttribute("username", username);
-            req.getRequestDispatcher("/page/to-do.html").forward(req, resp);
+            req.getRequestDispatcher("/page/to-do.jsp").forward(req, resp);
             UserStorage.userDatabase.put(username, new User(username, password, "user"));
             Logger.log("User " + username + " registered successfully");
         } else {
@@ -46,7 +46,7 @@ public class RegistrationServlet extends HttpServlet {
         if (username == null) {
             req.getRequestDispatcher("page/register.html").forward(req, resp);
         } else {
-            req.getRequestDispatcher("/page/to-do.html").forward(req, resp);
+            req.getRequestDispatcher("/page/to-do.jsp").forward(req, resp);
         }
     }
 

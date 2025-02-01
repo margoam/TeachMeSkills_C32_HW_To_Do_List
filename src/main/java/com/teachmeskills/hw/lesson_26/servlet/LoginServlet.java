@@ -35,8 +35,8 @@ public class LoginServlet extends HttpServlet {
             req.getSession().setAttribute("username", user.getLogin());
             req.getSession().setAttribute("role", user.getRole());
 
-            Logger.log("User logged in: " + user.getLogin() + " (Role: " + user.getRole() + ")");
-            req.getRequestDispatcher("/page/to-do.html").forward(req, resp);
+            //Logger.log("User logged in: " + user.getLogin() + " (Role: " + user.getRole() + ")");
+            resp.sendRedirect("/to-do");
         } else {
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid username or password.");
         }
@@ -51,7 +51,7 @@ public class LoginServlet extends HttpServlet {
             req.getRequestDispatcher("page/login.html").forward(req, resp);
             resp.getWriter().println("<h2>Login Failed. Please, sign up</h2>");
         } else {
-            req.getRequestDispatcher("page/to-do.html").forward(req, resp);
+            resp.sendRedirect("/to-do");
         }
     }
 

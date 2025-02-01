@@ -82,10 +82,134 @@ input {
     position: absolute;
     top: 20px;
     right: 20px;
-    /*    display: flex;
-        justify-items: right;*/
 }
 
 .header-buttons form {
     display: inline;
 }
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 50%;
+    margin: auto;
+    padding: 20px;
+    background: white;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    margin-top: 50px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #ddd;
+}
+.header h1 {
+    font-size: 24px;
+    color: #333;
+}
+
+.header-buttons {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.header-buttons form {
+    display: inline;
+}
+
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.logout-btn {
+    background-color: #d9534f;
+    color: white;
+}
+
+.logout-btn:hover {
+    background-color: #c9302c;
+}
+
+.add-btn {
+    background-color: #5cb85c;
+    color: white;
+}
+
+.add-btn:hover {
+    background-color: #4cae4c;
+}
+
+.delete-btn {
+    background-color: #d9534f;
+    color: white;
+}
+
+.delete-btn:hover {
+    background-color: #c9302c;
+}
+
+.task-form {
+    display: flex;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.task-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.task-list-title {
+    font-size: 20px;
+    margin-top: 20px;
+    color: #333;
+}
+
+.empty-task-msg {
+    font-size: 16px;
+    color: #777;
+    margin-top: 10px;
+}
+
+.task-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 12px;
+    margin-top: 8px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.task-text {
+    font-size: 16px;
+}
+
+.delete-form {
+    margin: 0;
+}
+
