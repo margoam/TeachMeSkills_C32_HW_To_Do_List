@@ -10,8 +10,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 import java.util.Set;
+
 import com.google.gson.Gson;
 
 
@@ -86,9 +88,7 @@ public class TodoServlet extends HttpServlet {
         User user = UserStorage.userDatabase.get(username);
 
         if (user == null) {
-            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            resp.setContentType("application/json");
-            resp.getWriter().write("{\"error\": \"Unauthorized\"}");
+            resp.sendRedirect("login.html");
             return;
         }
 
@@ -126,6 +126,5 @@ public class TodoServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         resp.getWriter().write(new Gson().toJson(tasks));
     }
-
 }
 
