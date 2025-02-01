@@ -1,4 +1,3 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -17,47 +16,109 @@
         </div>
     </div>
 
-    <form action="to-do" method="POST" class="task-form">
+    <form id="task-form" class="task-form">
         <label>
-            <input type="text" class="task-input" name="task" placeholder="Enter your task" required>
+            <input type="text" class="task-input" id="task-input" placeholder="Enter your task" required>
         </label>
         <button type="submit" class="btn add-btn">Add Task</button>
     </form>
 
     <h2 class="task-list-title">Task List</h2>
+    <ul id="task-list" class="task-list"></ul>
 
-    <c:if test="${tasks != null || !tasks.isEmpty()}">
-        <ul class="task-list">
-            <c:forEach var="task" items="${tasks}">
-                <li class="task-item">
-                    <span class="task-text">${task.title}</span>
-                    <form action="to-do" method="POST" class="delete-form">
-                        <input type="hidden" name="deletedTask" value="${task.title}">
-                        <button type="submit" class="btn delete-btn">Delete</button>
-                    </form>
-                </li>
-            </c:forEach>
-        </ul>
-    </c:if>
-
-    <c:if test="${tasks == null || tasks.isEmpty()}}">
-        <p class="empty-task-msg">There are no active tasks!</p>
-    </c:if>
-
-    <c:if test="${tasks != null || !tasks.isEmpty()}">
-        <ul class="task-list">
-            <c:forEach var="task" items="${tasks}">
-                <li class="task-item">
-                    <span class="task-text">${task.title}</span>
-                    <form action="to-do" method="POST" class="delete-form">
-                        <input type="hidden" name="deletedTask" value="${task.title}">
-                        <button type="submit" class="btn delete-btn">Delete</button>
-                    </form>
-                </li>
-            </c:forEach>
-        </ul>
-    </c:if>
+    <p id="empty-message" class="empty-task-msg" style="display: none;">There are no active tasks!</p>
 </div>
+
+<script>
+    let tasks = [];
+
+    <% if (request.getAttribute("tasks") != null) { %>
+    tasks = <%= request.getAttribute("tasks") %>;
+    <% } %>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        renderTasks(tasks);
+    });
+
+    function renderTasks(tasks) {
+        const taskListElement = document.getElementById('task-list');
+        taskListElement.innerHTML = '';
+
+        if (tasks.length === 0) {
+            document.getElementById('empty-message').style.display = 'block';
+        } else {
+            document.getElementById('empty-message').style.display = 'none';
+
+            tasks.forEach(task => {
+                const taskItem = document.createElement('li');
+                taskItem.classList.add('task-item');
+
+                const taskText = document.createElement('span');
+                taskText.classList.add('task-text');
+                taskText.textContent = task.title;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.classList.add('btn', 'delete-btn');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = () => deleteTask(task.id);
+
+                taskItem.appendChild(taskText);
+                taskItem.appendChild(deleteButton);
+
+                taskListElement.appendChild(taskItem);
+            });
+        }
+    }
+
+    function loadTasks() {
+        fetch('/to-do')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load tasks');
+                }
+                return response.json();
+            })
+            .then(tasks => {
+                renderTasks(tasks);
+            })
+            .catch(error => console.error('Error loading tasks:', error));
+    }
+
+    document.getElementById('task-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const taskInput = document.getElementById('task-input');
+        const newTask = {
+            title: taskInput.value
+        };
+
+        fetch('/to-do', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `task=${encodeURIComponent(newTask.title)}`
+        })
+            .then(response => response.json())
+            .then(data => {
+                tasks = data;
+                taskInput.value = '';
+                renderTasks(tasks);
+            })
+            .catch(error => console.error('Error adding task:', error));
+    });
+
+    function deleteTask(taskId) {
+        fetch(`/to-do?deletedTask=${encodeURIComponent(taskId)}`, {
+            method: 'DELETE'
+        })
+            .then(response => response.json())
+            .then(updatedTasks => {
+                renderTasks(updatedTasks);
+            })
+            .catch(error => console.error('Error deleting task:', error));
+    }
+
+</script>
 
 </body>
 </html>
