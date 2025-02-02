@@ -25,7 +25,7 @@ public class TodoServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("username") == null) {
-            resp.sendRedirect("login.html");
+            resp.sendRedirect("login");
             return;
         }
 
@@ -45,7 +45,7 @@ public class TodoServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("username") == null) {
-            resp.sendRedirect("login.html");
+            resp.sendRedirect("login");
             return;
         }
 
@@ -53,17 +53,18 @@ public class TodoServlet extends HttpServlet {
         User user = UserStorage.userDatabase.get(username);
 
         if (user == null) {
-            resp.sendRedirect("login.html");
+            resp.sendRedirect("login");
             return;
         }
 
         Set<Task> tasks = TaskStorage.getTasksForUser(user);
 
         String taskTitle = req.getParameter("task");
+        String taskDescription = req.getParameter("description");
 
         if (taskTitle != null && !taskTitle.isEmpty()) {
-            int newId = tasks.size() + 1;
-            Task newTask = new Task(newId, taskTitle, "");
+            int newId = tasks.stream().mapToInt(Task::getId).max().orElse(0) + 1;
+            Task newTask = new Task(newId, taskTitle, taskDescription != null ? taskDescription : "");
             tasks.add(newTask);
             TaskStorage.taskDatabase.put(user, tasks);
         }
@@ -71,32 +72,30 @@ public class TodoServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         resp.getWriter().write(new Gson().toJson(tasks));
-
     }
+
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
         HttpSession session = req.getSession(false);
         if (session == null || session.getAttribute("username") == null) {
-            resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            resp.setContentType("application/json");
-            resp.getWriter().write("{\"error\": \"Unauthorized\"}");
+            sendJsonResponse(resp, HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
             return;
         }
 
         String username = (String) session.getAttribute("username");
         User user = UserStorage.userDatabase.get(username);
-
         if (user == null) {
-            resp.sendRedirect("login.html");
+            resp.sendRedirect("login");
             return;
         }
 
         String deletedTaskIdStr = req.getParameter("deletedTask");
         if (deletedTaskIdStr == null || deletedTaskIdStr.isEmpty()) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.setContentType("application/json");
-            resp.getWriter().write("{\"error\": \"Missing task ID\"}");
+            sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Missing task ID");
             return;
         }
 
@@ -104,27 +103,25 @@ public class TodoServlet extends HttpServlet {
         try {
             deletedTaskId = Integer.parseInt(deletedTaskIdStr);
         } catch (NumberFormatException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.setContentType("application/json");
-            resp.getWriter().write("{\"error\": \"Invalid task ID\"}");
+            sendJsonResponse(resp, HttpServletResponse.SC_BAD_REQUEST, "Invalid task ID");
             return;
         }
 
         Set<Task> tasks = TaskStorage.getTasksForUser(user);
-        boolean removed = tasks.removeIf(task -> task.getId() == deletedTaskId);
-
-        if (!removed) {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            resp.setContentType("application/json");
-            resp.getWriter().write("{\"error\": \"Task not found\"}");
+        if (!tasks.removeIf(task -> task.getId() == deletedTaskId)) {
+            sendJsonResponse(resp, HttpServletResponse.SC_NOT_FOUND, "Task not found");
             return;
         }
 
         TaskStorage.taskDatabase.put(user, tasks);
 
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-        resp.getWriter().write(new Gson().toJson(tasks));
+        sendJsonResponse(resp, HttpServletResponse.SC_OK, tasks);
     }
+
+    private void sendJsonResponse(HttpServletResponse resp, int status, Object message) throws IOException {
+        resp.setStatus(status);
+        resp.getWriter().write(new Gson().toJson(message));
+    }
+
 }
 

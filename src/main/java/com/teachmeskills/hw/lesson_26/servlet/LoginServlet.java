@@ -38,7 +38,7 @@ public class LoginServlet extends HttpServlet {
             //Logger.log("User logged in: " + user.getLogin() + " (Role: " + user.getRole() + ")");
             resp.sendRedirect("/to-do");
         } else {
-            resp.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid username or password.");
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Please, sign in or sign up.");
         }
 
     }

@@ -20,6 +20,9 @@
         <label>
             <input type="text" class="task-input" id="task-input" placeholder="Enter your task" required>
         </label>
+        <label>
+            <input type="text" class="task-description" id="task-description" placeholder="Enter description">
+        </label>
         <button type="submit" class="btn add-btn">Add Task</button>
     </form>
 
@@ -57,13 +60,22 @@
                 taskText.classList.add('task-text');
                 taskText.textContent = task.title;
 
+                const taskDescription = document.createElement('p');
+                taskDescription.classList.add('task-text-description');
+                taskDescription.textContent = task.description ? task.description : "No description";
+
                 const deleteButton = document.createElement('button');
                 deleteButton.classList.add('btn', 'delete-btn');
                 deleteButton.textContent = 'Delete';
                 deleteButton.onclick = () => deleteTask(task.id);
 
+                const taskActions = document.createElement('div');
+                taskActions.classList.add('task-actions');
+                taskActions.appendChild(deleteButton);
+
                 taskItem.appendChild(taskText);
-                taskItem.appendChild(deleteButton);
+                taskItem.appendChild(taskDescription);
+                taskItem.appendChild(taskActions);
 
                 taskListElement.appendChild(taskItem);
             });
@@ -84,11 +96,13 @@
             .catch(error => console.error('Error loading tasks:', error));
     }
 
-    document.getElementById('task-form').addEventListener('submit', function(event) {
+    document.getElementById('task-form').addEventListener('submit', function (event) {
         event.preventDefault();
         const taskInput = document.getElementById('task-input');
+        const taskDescription = document.getElementById('task-description');
         const newTask = {
-            title: taskInput.value
+            title: taskInput.value,
+            description: taskDescription.value
         };
 
         fetch('/to-do', {
@@ -96,12 +110,13 @@
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
             },
-            body: `task=${encodeURIComponent(newTask.title)}`
+            body: `task=${encodeURIComponent(newTask.title)}&description=${encodeURIComponent(newTask.description)}`
         })
             .then(response => response.json())
             .then(data => {
                 tasks = data;
                 taskInput.value = '';
+                taskDescription.value = '';
                 renderTasks(tasks);
             })
             .catch(error => console.error('Error adding task:', error));
@@ -117,7 +132,6 @@
             })
             .catch(error => console.error('Error deleting task:', error));
     }
-
 </script>
 
 </body>
